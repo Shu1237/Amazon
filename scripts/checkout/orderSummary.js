@@ -1,28 +1,19 @@
 import { cart, removeFromCart, updateDeliveryOption } from "../../data/cart.js";
-import { products,getProduct } from "../../data/products.js";
-import { deliveryOptions,getDeliveryOption} from "../../data/deliveryOptions.js";
+import { products, getProduct } from "../../data/products.js";
+import { deliveryOptions, getDeliveryOption } from "../../data/deliveryOptions.js";
 import { formatCurrenct } from "../utils/money.js";
+import { renderPaymentSummary } from "../../scripts/checkout/paymentSummary.js";
+
 
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
-
-// const today = dayjs();
-// const deliveryDate = today.add(7, 'day');
-// console.log(deliveryDate);
-// console.log(deliveryDate.format('dddd,MMMM D'));
-
-// hello();
 
 export function renderOrderSumary() {
   let cartSumary = '';
   cart.forEach((cartItem) => {
     const productId = cartItem.productId;
-    const matchingProduct =getProduct(productId);
+    const matchingProduct = getProduct(productId);
 
-   
-    const deliveryOptionId = cartItem.deliveryOptionsId;
-    
-    let deliveryOption = getDeliveryOption(deliveryOptionId);
-    
+    const deliveryOption = getDeliveryOption(cartItem.deliveryOptionsId);
 
     if (deliveryOption) { // Ensure deliveryOption is defined
       const today = dayjs();
@@ -74,7 +65,7 @@ export function renderOrderSumary() {
     let html = '';
     deliveryOptions.forEach((deliveryOption) => {
       const today = dayjs();
-      const deliveryDate = today.add(deliveryOption.deliveryDays, 'days'); // Fixed typo here
+      const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
       const dateString = deliveryDate.format('dddd,MMMM D');
 
       const priceString = deliveryOption.priceCents === 0 ? "FREE" : `$${formatCurrenct(deliveryOption.priceCents)}`;
@@ -106,9 +97,12 @@ export function renderOrderSumary() {
     link.addEventListener('click', () => {
       const productId = link.dataset.productId;
       removeFromCart(productId);
-
+      //delete item
       const container = document.querySelector(`.js-cart-item-container-${productId}`);
       container.remove();
+
+      //update bill
+      renderPaymentSummary();
     });
   });
 
@@ -118,6 +112,7 @@ export function renderOrderSumary() {
         const { productId, deliveryOptionId } = element.dataset;
         updateDeliveryOption(productId, deliveryOptionId);
         renderOrderSumary();
+        renderPaymentSummary();
       });
     });
 }
