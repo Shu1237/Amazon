@@ -58,7 +58,7 @@ export function renderPaymentSummary() {
           </button>`;
         
       const totalItem =` Checkout (<a class="return-to-home-link"
-            href="amazon.html">${quantity}</a>)`
+            href="amazon.html">${quantity} items</a>)`
     document.querySelector('.js-payment-summary').innerHTML = paymentSummaryHTML;
     document.querySelector('.js-quanlity').innerHTML = totalItem;
     
